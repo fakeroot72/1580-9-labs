@@ -217,7 +217,7 @@ def main():
             return 2
 
         for _ in range(tests):
-           arr_bubble = random_list(min_len, max_len, min_val, max_val)
+           arr_bubble = [random_number(min_val, max_val) for _ in range(round(random_number(min_len, max_len)))]
            arr_select = clone(arr_bubble)
            arr_merge = clone(arr_bubble)
            arr_sort = clone(arr_bubble)
@@ -252,15 +252,15 @@ def main_wrapper():
         exit = main()
         i = 0
         while(True):
-            again = input("sort again or exit? (y/n): "
+            again = input("sort again or exit? (y/n): ")
             if(again == "n"):
                 return exit
             elif(again == "y"):
                 break
             else:
                 if(i >= 10):
-                    print("press y and then enter to use the program again")
-                    print("press n and then enter to exit the program")
+                    print("press y and then press enter to use the program again")
+                    print("press n and then press enter to exit the program")
                 print("y - sort again, n - exit")
                 i += 1
 
