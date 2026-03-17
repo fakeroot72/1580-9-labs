@@ -83,61 +83,96 @@ def merge(arr):
 def random_number(min_num, max_num):
     return round(min_num + (max_num - min_num) * random(), 5)
 
-def check_int(num, name):
+def check_int(num):
     if(not (num.replace('-', '').isnumeric() and num.count('-') <= 1)):
-        print("\x1b[31mERROR: \x1b[0m " + name + " is not a whole number")
+        print(f"\x1b[31mERROR: \x1b[0m \"{num}\"  is not a whole number")
         return 2
     return 0
 
-def check_float(num, name):
+def check_float(num):
     if(not (((num[0] == "-" and num.count("-") == 1) or num.count('-') == 0) and num.count(".") <= 1 and num.replace('-', '').replace('.', '').isnumeric())):
-        print("\x1b[31mERROR: \x1b[0m " + name + " is not a number")
+        print(f"\x1b[31mERROR: \x1b[0m \"{num}\" is not a number")
         return 2
     return 0
+
+def check_number_array(arr):
+    err = 0
+    for i in arr.split():
+        if(i != 'r'):
+            err |= check_float(i)
+    return err
+
+def check_range(rng):
+    rng = rng.split()
+    if(len(rng) != 2):
+        print("\x1b[31mERROR: \x1b[0mrange is exactly 2 numbers")
+        return 2
+
+    return check_float(rng[0]) | check_float(rng[1])
+
+def check_sort(sort):
+    if(sort != "bubble" and sort != "select" and sort != "merge"):
+        print("\x1b[31mERROR: \x1b[0munknown sorting method: " + sort)
+        print("available modes: bubble, select, merge")
+        return 2
+
+    return 0
+
+def check_tests(tests):
+    if(check_int(tests) == 2):
+        return 2
+
+    tests = int(tests)
+    if(tests < 0):
+        print("\x1b[31mERROR: \x1b[0mtests cannot be less than 0")
+        return 2
+
+    return 0
+
+
+def check_length(ln):
+    if(check_int(ln) == 2):
+        return 2
+
+    ln = int(ln)
+    if(ln < 0):
+        print("\x1b[31mERROR: \x1b[0mlength cannot be less than 0")
+        return 2
+
+    return 0
+
+def check_input(request, checkers):
+    value = ""
+    incorrect = 1
+    while(incorrect):
+        incorrect = 0
+        value = input(request)
+        for check in checkers:
+            incorrect |= check(value)
+
+    return value
+
+
 
 def main():
     while(True):
         mode = input("mode: ")
         if(mode == "interactive"):
-            rand_range = [0, 0]
-            asked_rand = 0;
-            arr = []
-            while(True):
-                arr = input("array of numbers(r for random): ").split()
-                for i in range(len(arr)):
-                    if(arr[i] == "r"):
-                        if(not asked_rand):
-                            while(True):
-                                rand_range = input("random range from to: ").split()
-                                if(len(rand_range) != 2):
-                                    print("\x1b[31mERROR: \x1b[0mrange is exactly 2 numbers")
-                                    continue
+            rand_range = (0, 0)
+            asked_rand = False;
+            arr = check_input("array of numbers(r for random): ", (check_number_array,)).split()
+            for i in range(len(arr)):
+                if(arr[i] == "r"):
+                    if(not asked_rand):
+                        rand_range = tuple(map(int, check_input("random range from to: ", (check_range,)).split()))
+                        asked_rand = True
 
-                                asked_rand = 1
-                                if(check_float(rand_range[0], "\"" + rand_range[0] + "\"") != 2 and check_float(rand_range[1], "\"" + rand_range[1] + "\"") != 2):
-                                    rand_range = sorted(list(map(float, rand_range)))
-                                else:
-                                    continue
+                    arr[i] = random_number(rand_range[0], rand_range[1])
 
-                                break
+                else:
+                    arr[i] = float(arr[i])
 
-                        arr[i] = random_number(rand_range[0], rand_range[1])
-
-                    else:
-                        if(check_float(arr[i], "\"" + arr[i] + "\"") != 2):
-                            arr[i] = float(arr[i])
-                        else:
-                            break
-                else: break
-
-            sort = ""
-            while(True):
-                sort = input("sorting method: ")
-                if(sort != "bubble" and sort != "select" and sort != "merge"):
-                    print("\x1b[31mERROR: \x1b[0munknown sorting method: " + sort)
-                    print("available modes: bubble, select, merge")
-                    continue
-                break
+            sort = check_input("sorting method: ", (check_sort,))
 
             comps = 0
             permuts = 0
@@ -160,7 +195,7 @@ def main():
             arr_select = clone(arr_bubble)
             arr_merge = clone(arr_bubble)
 
-            print("unsorted:      " + str(arr_bubble))
+            print("unsorted: " + str(arr_bubble))
             comps_bubble = 0
             permuts_bubble = 0
             comps_select = 0
@@ -182,69 +217,27 @@ def main():
             return 0
 
         elif(mode == "test"):
-            tests = 0
-            while(True):
-                tests = input("how many tests: ")
-                if(check_int(tests, "tests") == 2):
-                    continue
-
-                tests = int(tests)
-                if(tests < 0):
-                    print("\x1b[31mERROR: \x1b[0mtests cannot be less than 0")
-                    continue
-                break
+            tests = int(check_input("how many tests: ", (check_tests,)))
 
             if(tests == 0):
                 print("\x1b[33mWARNING: \x1b[0mno tests executed")
 
             min_len = 0
             max_len = 0
-            # this is the most awful and unreadable code i ever wrote
+            # can't get rid of this while
             while(True):
-                while(True):
-                    min_len = input("minimum lenght: ")
-                    if(check_float(min_len, "lenght") == 2):
-                        continue
-
-                    min_len = int(min_len)
-                    if(min_len < 0):
-                        print("\x1b[31mERROR: \x1b[0mlenght cannot be less than 0")
-                        continue
-                    break
-
-                while(True):
-                    max_len = input("maximum lenght: ")
-                    if(check_float(max_len, "lenght") == 2):
-                        continue
-
-                    max_len = int(max_len)
-                    if(max_len < 0):
-                        print("\x1b[31mERROR: \x1b[0mlenght cannot be less than 0")
-                        continue
-                    break
-
+                min_len = int(check_input("minimum length: ", (check_length,)))
+                max_len = int(check_input("maximum length: ", (check_length,)))
                 if(min_len > max_len):
-                    print("\x1b[31mERROR: \x1b[0mminimum lenght should be less or equal than maximum")
+                    print("\x1b[31mERROR: \x1b[0mminimum length should be less or equal than maximum")
                     continue
                 break
 
             min_val = 0
             max_val = 0
             while(True):
-                while(True):
-                    min_val = input("minimum value: ")
-                    if(check_float(min_val, "value") == 2):
-                        continue
-                    break
-
-                while(True):
-                    min_val = float(min_val)
-                    max_val = input("maximum value: ")
-                    if(check_float(max_val, "value") == 2):
-                        continue
-                    break
-
-                max_val = float(max_val)
+                min_val = float(check_input("minimum value: ", (check_float,)))
+                max_val = float(check_input("maximum value: ", (check_float,)))
                 if(min_val > max_val):
                     print("\x1b[31mERROR: \x1b[0mminimum value should be less or equal than maximum")
                     continue
