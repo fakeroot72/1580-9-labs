@@ -1,25 +1,32 @@
-class Planet:
-    __instances: set = set()
-    __log_creation_deletion: bool = true
+class Planet_meta(type):
+    def __init__(cls, *args, **kwargs):
+        cls.__instances = set()
+        cls.__log_creation_deletion = True
 
-    __id: int = 0
-    name: string = 'none'
-    radius: float = 0.0
-    mass: float = 0.0
-    sun_distance: float = 0.0
-    type: string = 'none'
+    @property
+    def log_creation_deletion(cls):
+        return cls.__log_creation_deletion
 
-    def __init__(name: string, radius: float, mass: float, sun_distance: float, type: string):
-        self.name = name
-        self.radius = radius
-        self.mass = mass
-        self.sun_distance = sun_distance
-        self.type = type
+    @log_creation_deletion.setter
+    def log_creation_deletion(cls, val: bool):
+        cls.__log_creation_deletion = val
+
+class Planet(metaclass=Planet_meta):
+    __instances: set
+    __log_creation_deletion: bool
+
+    def __init__(self, name: str, radius: float, mass: float, sun_distance: float, planet_type: str):
+        self.name: str = name
+        self.radius: float = radius
+        self.mass: float = mass
+        self.sun_distance: float = sun_distance
+        self.type: str = planet_type
         i = 0
         while(i in type(self).__instances):
             i += 1
+
         type(self).__instances.add(i)
-        __id = i
+        self.__id = i
         if(type(self).__log_creation_deletion):
             print(f"Created planet ID {i}")
 
@@ -34,21 +41,26 @@ class Planet:
         if(type(self).__log_creation_deletion):
             print(f"Destroyed planet ID {self.__id}")
 
-    @property
-    def log_creation_deletion(self):
-        return type(self).__log_creation_deletion
+    def __copy__(self):
+        return type(self).from_dict(self.to_dict())
 
-    @log_creation_deletion.setter
-    def log_creation_deletion(self, val: bool):
-        type(self).__log_creation_deletion = val
+    # less by sun distance and equality by name just feels wrong...
+    def __lt__(self, other):
+        return self.sun_distance < other.sun_distance
+
+    def __gt__(self, other):
+        return self.sun_distance > other.sun_distance
+
+    def __eq__(self, other):
+        return self.name == other.name
 
     def to_dict(self):
         return {
             'name': self.name,
             'radius': self.radius,
             'mass': self.mass,
-            'sun_distance': sun_distance
-            'type': type
+            'sun_distance': self.sun_distance,
+            'type': self.type
         }
 
     @classmethod
