@@ -3,8 +3,11 @@ poop
 
 # Files
 
-| File        | Description         |
-| ----------- | ------------------- |
-| `db.py`     | Data base manager   |
-| `planet.py` | Planet class        |
-| `sort.py`   | methods for sorting |
+| File        | Description                  |
+| ----------- | ---------------------------- |
+| `car.py`    | Car class                    |
+| `color.py`  | Color class + color presets  |
+| `db.py`     | class DatabaseManager        |
+| `main.py`   | Database manager (main menu) |
+| `planet.py` | Planet class                 |
+| `sort.py`   | Methods for sorting          |

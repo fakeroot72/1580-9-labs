@@ -2,7 +2,7 @@ import pickle
 import sort
 
 class DataBaseManager:
-    def __init__(self, always_sorted: bool = False, single: bool = False, single_object=None):
+    def __init__(self, always_sorted: bool = False, cmp_less = None, single: bool = False, single_object = None):
         self.__single = single
         if(not single):
             self.__db = []
@@ -11,7 +11,7 @@ class DataBaseManager:
 
         self.always_sorted = always_sorted
         self.__sorted = True
-        self.cmp_less=None
+        self.cmp_less = None
 
     @property
     def db(self):
@@ -65,11 +65,13 @@ class DataBaseManager:
         else:
             sort.merge(self.__db, cmp_less)
 
-    def search(self, target, key=None):
+    def search(self, target, binary_search: bool = False, key=None):
         if(key == None):
             key = lambda a : a
 
-        if(sorted):
+        if(binary_search):
+            if(not self.__sorted):
+                print("\x1b[33mWARNING: \x1b[0using binary search on unsorted list")
             try:
                 low = 0
                 high = len(self.__db) - 1
@@ -96,7 +98,7 @@ class DataBaseManager:
         except ValueError:
             pass
 
-        return db[index] if index != None else None
+        return self.__db[index] if index != None else None
 
     def save(self, filename: str):
         with open(filename, 'wb') as output:
