@@ -7,7 +7,7 @@ poop
 | ----------- | ---------------------------- |
 | `car.py`    | Car class                    |
 | `color.py`  | Color class + color presets  |
-| `db.py`     | class DatabaseManager        |
+| `db.py`     | DatabaseManager class        |
 | `main.py`   | Database manager (main menu) |
 | `planet.py` | Planet class                 |
 | `sort.py`   | Methods for sorting          |
